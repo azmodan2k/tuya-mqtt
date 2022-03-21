@@ -1,3 +1,4 @@
+const colorsys = require('colorsys');
 const TuyAPI = require('tuyapi')
 const { evaluate } = require('mathjs')
 const utils = require('../lib/utils')
@@ -389,6 +390,33 @@ class TuyaDevice {
                 this.updateCommandColor(command, deviceTopic.components);
                 tuyaCommand.set = this.parseTuyaHsbColor();
                 break;
+            case 'hex':
+                var hexHsvConvert = colorsys.hexToHsv(command);
+                command = hexHsvConvert.h + ',' + hexHsvConvert.s + ',' + hexHsvConvert.v;
+                this.updateCommandColor(command, deviceTopic.components);
+                tuyaCommand.set = this.parseTuyaHsbColor();
+                break;
+            case 'predefinedColors':
+                var nextColor = this.getNextPredefinedColor(command);
+
+                debug('nextColor: ' + nextColor.name);
+
+                var predefinedColorsHsvConvert = colorsys.hexToHsv(nextColor.colorHex);
+                command = predefinedColorsHsvConvert.h + ',' + predefinedColorsHsvConvert.s + ',' + predefinedColorsHsvConvert.v;
+                this.updateCommandColor(command, deviceTopic.components);
+                tuyaCommand.set = this.parseTuyaHsbColor();
+
+                this.currentPredefinedColor = nextColor.name;
+
+                break;
+            case 'predefinedScenes':
+                var nextScene = this.getNextPredefinedScene(command);
+                debug('nextScene: ' + nextScene.name);
+
+                tuyaCommand.set = nextScene.code;
+
+                this.currentPredefinedScene = nextScene.name;
+                break;                
             case 'hsbhex':
                 this.updateCommandColor(command, deviceTopic.components);
                 tuyaCommand.set = this.parseTuyaHsbHexColor();

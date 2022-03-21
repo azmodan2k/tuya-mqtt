@@ -1,7 +1,9 @@
-const TuyaDevice = require('./tuya-device')
-const debug = require('debug')('tuya-mqtt:device-detect')
-const debugDiscovery = require('debug')('tuya-mqtt:discovery')
-const utils = require('../lib/utils')
+const TuyaDevice = require('./tuya-device');
+const debug = require('debug')('tuya-mqtt:device-detect');
+const debugColor = require('debug')('tuya-mqtt:color');
+const debugScene = require('debug')('tuya-mqtt:scene');
+const debugDiscovery = require('debug')('tuya-mqtt:discovery');
+const utils = require('../lib/utils');
 
 class RGBTWLight extends TuyaDevice {
     async init() {
@@ -27,6 +29,7 @@ class RGBTWLight extends TuyaDevice {
         this.config.colorTempScale = this.config.colorTempScale ? this.config.colorTempScale : this.guess.colorTempScale
         this.config.dpsColor = this.config.dpsColor ? this.config.dpsColor : this.guess.dpsColor
         this.config.colorType = this.config.colorType ? this.config.colorType : this.guess.colorType
+        this.config.dpsScene = this.config.dpsScene ? this.config.dpsScene : this.guess.dpsScene
 
         this.deviceData.mdl = 'RGBTW Light'
         this.isRgbtwLight = true
@@ -74,11 +77,54 @@ class RGBTWLight extends TuyaDevice {
                 type: this.config.colorType,
                 components: 'h,s,b'
             },
+            hex_state: {
+                key: this.config.dpsColor,
+                type: 'hex',
+                components: 'h,s,b'
+            },
+            predefinedColors_state: {
+                key: this.config.dpsColor,
+                type: 'predefinedColors',
+                components: 'h,s,b'
+            },
+            predefinedScenes_state: {
+                key: this.config.dpsScene,
+                type: 'predefinedScenes',
+                components: 'str'
+            },
             mode_state: {
                 key: this.config.dpsMode,
                 type: 'str'
             }
-        }
+        };
+
+        this.predefinedColors = [
+            { "name": "red", "colorHex": "#FF0000" },
+            { "name": "maroon", "colorHex": "#800000" },
+            { "name": "yellow", "colorHex": "#FFFF00" },
+            { "name": "olive", "colorHex": "#808000" },
+            { "name": "lime", "colorHex": "#00FF00" },
+            { "name": "green", "colorHex": "#008000" },
+            { "name": "aqua", "colorHex": "#00FFFF" },
+            { "name": "teal", "colorHex": "#008080" },
+            { "name": "blue", "colorHex": "#0000FF" },
+            { "name": "navy", "colorHex": "#000080" },
+            { "name": "fuchsia", "colorHex": "#FF00FF" },
+            { "name": "purple", "colorHex": "#800080" }
+        ];        
+        this.currentPredefinedColor = "red";
+
+        this.predefinedScenes = [
+            { "name": "night", "code": "000e0d0000000000000000c803e8" },
+            { "name": "read", "code": "010e0d0000000000000003e803e8" },
+            { "name": "working", "code": "020e0d0000000000000003e803e8" },
+            { "name": "leisure", "code": "030e0d0000000000000001f403e8" },
+            { "name": "soft", "code": "04464602007803e803e800000000464602007803e8000a00000000" },
+            { "name": "colorful", "code": "05464601000003e803e800000000464601007803e803e80000000046460100f003e803e800000000464601003d03e803e80000000046460100ae03e803e800000000464601011303e803e800000000" },
+            { "name": "dazzling", "code": "06464601000003e803e800000000464601007803e803e80000000046460100f003e803e800000000" },
+            { "name": "gorgeous", "code": "07464602000003e803e800000000464602007803e803e80000000046460200f003e803e800000000464602003d03e803e80000000046460200ae03e803e800000000464602011303e803e800000000" }
+        ];    
+        this.currentPredefinedScene = "night";
 
         // If device supports Color Temperature add color temp device topic
         if (this.config.dpsColorTemp) {
@@ -103,6 +149,70 @@ class RGBTWLight extends TuyaDevice {
 
         // Get initial states and start publishing topics
         this.getStates()
+    }
+
+    getNextPredefinedColor(newColor) {
+        if(newColor === 'next') {
+            debugColor('get next color by index');
+
+            var currentIndex = this.predefinedColors.indexOf(this.predefinedColors.find(f => f.name === this.currentPredefinedColor));
+            var nextIndex = currentIndex + 1;
+            nextIndex = nextIndex % this.predefinedColors.length;
+    
+            return this.predefinedColors[nextIndex];
+        }
+
+        if(newColor === 'prev') {
+            debugColor('get prev color by index');
+
+            var currentIndex = this.predefinedColors.indexOf(this.predefinedColors.find(f => f.name === this.currentPredefinedColor));
+            var nextIndex = currentIndex - 1;
+            if(nextIndex < 0) { nextIndex = this.predefinedColors.length - 1; }
+    
+            return this.predefinedColors[nextIndex];
+        }
+
+        debugColor('get next color by color wish ' + newColor);
+        var nextColor = this.predefinedColors.find(f => f.name === newColor);
+        debugColor('found nextColor ' + nextColor.name);
+
+        if(!nextColor) {
+            return this.getNextPredefinedColor('next');
+        }
+
+        return nextColor;
+    }
+
+    getNextPredefinedScene(newScene) {
+        if(newScene === 'next') {
+            debugScene('get next scene by index');
+
+            var currentIndex = this.predefinedScenes.indexOf(this.predefinedScenes.find(f => f.name === this.currentPredefinedScene));
+            var nextIndex = currentIndex + 1;
+            nextIndex = nextIndex % this.predefinedScenes.length;
+    
+            return this.predefinedScenes[nextIndex];
+        }
+
+        if(newScene === 'prev') {
+            debugScene('get prev scene by index');
+
+            var currentIndex = this.predefinedScenes.indexOf(this.predefinedScenes.find(f => f.name === this.currentPredefinedScene));
+            var nextIndex = currentIndex - 1;
+            if(nextIndex < 0) { nextIndex = this.predefinedScenes.length - 1; }
+    
+            return this.predefinedScenes[nextIndex];
+        }
+
+        debugScene('get next scene by scene wish ' + newScene);
+        var nextScene = this.predefinedScenes.find(f => f.name === newScene);
+        debugScene('found nextScene ' + nextScene.name);
+
+        if(!nextScene) {
+            return this.predefinedScenes('next');
+        }
+
+        return nextScene;
     }
 
     initDiscovery() {
@@ -151,8 +261,8 @@ class RGBTWLight extends TuyaDevice {
             debug('Detected likely Tuya color bulb at DPS 1-5, checking more details...')
             this.guess = {'dpsPower': 1, 'dpsMode': 2, 'dpsWhiteValue': 3, 'whiteValueScale': 255, 'dpsColorTemp': 4, 'colorTempScale': 255, 'dpsColor': 5}
         } else if (mode21 && (mode21 === 'white' || mode21 === 'colour' || mode21.toString().includes('scene'))) {
-            debug('Detected likely Tuya color bulb at DPS 20-24, checking more details...')
-            this.guess = {'dpsPower': 20, 'dpsMode': 21, 'dpsWhiteValue': 22, 'whiteValueScale': 1000, 'dpsColorTemp': 23, 'colorTempScale': 1000, 'dpsColor': 24}
+            debug('Detected likely Tuya color bulb at DPS 20-25, checking more details...')
+            this.guess = {'dpsPower': 20, 'dpsMode': 21, 'dpsWhiteValue': 22, 'whiteValueScale': 1000, 'dpsColorTemp': 23, 'colorTempScale': 1000, 'dpsColor': 24, 'dpsScene': 25}
         }
 
         if (this.guess.dpsPower) {

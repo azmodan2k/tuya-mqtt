@@ -20,7 +20,8 @@
     "mqtt": "^4.2.6",
     "supports-color": "^8.1.0",
     "tuyapi": "^6.1.4",
-    "mathjs": "8.1.1"
+    "mathjs": "8.1.1",
+    "colorsys": "1.0.22"
   },
   "repository": {
     "type": "git",
