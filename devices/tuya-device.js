@@ -599,6 +599,9 @@ class TuyaDevice {
                 // For other cases stay in existing mode
                 targetMode = this.dps[this.config.dpsMode].val;
             }
+        } else if (topic.key === this.config.dpsScene) {
+            targetMode = 'scene';
+            debug('new targetMode: ' + targetMode);
         }
 
         // Send the issued command
