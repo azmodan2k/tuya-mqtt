@@ -90,7 +90,7 @@ class RGBTWLight extends TuyaDevice {
             predefinedScenes_state: {
                 key: this.config.dpsScene,
                 type: 'predefinedScenes',
-                components: 'str'
+                components: 'scene'
             },
             mode_state: {
                 key: this.config.dpsMode,
