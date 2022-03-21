@@ -120,7 +120,7 @@ class RGBTWLight extends TuyaDevice {
             white_value_state_topic: this.baseTopic+'white_brightness_state',
             white_value_command_topic: this.baseTopic+'white_brightness_command',
             white_value_scale: 100,
-            availability_topic: this.baseTopic+'status',
+            availability_topic: this.baseTopic+'LWT',
             payload_available: 'online',
             payload_not_available: 'offline',
             unique_id: this.config.id,

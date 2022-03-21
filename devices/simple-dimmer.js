@@ -60,7 +60,7 @@ class SimpleDimmer extends TuyaDevice {
             brightness_state_topic: this.baseTopic+'brightness_state',
             brightness_command_topic: this.baseTopic+'brightness_command',
             brightness_scale: 100,
-            availability_topic: this.baseTopic+'status',
+            availability_topic: this.baseTopic+'LWT',
             payload_available: 'online',
             payload_not_available: 'offline',
             unique_id: this.config.id,
