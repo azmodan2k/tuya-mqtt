@@ -56,9 +56,9 @@ class SimpleDimmer extends TuyaDevice {
         const discoveryData = {
             name: (this.config.name) ? this.config.name : this.config.id,
             state_topic: this.baseTopic+'state',
-            command_topic: this.baseTopic+'command',
+            command_topic: this.baseTopic+'cmnd',
             brightness_state_topic: this.baseTopic+'brightness_state',
-            brightness_command_topic: this.baseTopic+'brightness_command',
+            brightness_command_topic: this.baseTopic+'brightness_cmnd',
             brightness_scale: 100,
             availability_topic: this.baseTopic+'LWT',
             payload_available: 'online',

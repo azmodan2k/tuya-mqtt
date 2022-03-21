@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  tuyamqtt:
+    hostname: tuyaMqtt
+    container_name: tuyaMqtt
+    build:
+      context: .
+    restart: always
+    volumes:
+      - ./config.json:/opt/tuya-mqtt/config.json
+      - ./devices.conf:/opt/tuya-mqtt/devices.conf
+    networks:
+      - default

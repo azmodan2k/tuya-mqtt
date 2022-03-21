@@ -296,7 +296,7 @@ class TuyaDevice {
         }
 
         // If get-states command, then updates all states and re-publish topics
-        if (commandTopic === 'command' && command === 'get-states') {
+        if (commandTopic === 'cmnd' && command === 'get-states') {
             // Handle "get-states" command to update device state
             debugCommand('Received command: ', command);
             this.getStates();
@@ -309,7 +309,7 @@ class TuyaDevice {
     // Process MQTT commands for all device command topics
     processDeviceCommand(command, commandTopic) {
         // Determine state topic from command topic to find proper template
-        const stateTopic = commandTopic.replace('command', 'state');
+        const stateTopic = commandTopic.replace('cmnd', 'state');
         const deviceTopic = this.deviceTopics.hasOwnProperty(stateTopic) ? this.deviceTopics[stateTopic] : '';
 
         if (deviceTopic) {
@@ -662,7 +662,7 @@ class TuyaDevice {
         this.mqttClient.publish(topic, message, { qos: 1 });
     }
 
-    getBasicTopic: string() {
+    getBasicTopic() {
         return this.baseTopic;
     }
 }

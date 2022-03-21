@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+'use strict';
+
 const fs = require('fs');
 const mqtt = require('mqtt');
 const json5 = require('json5');
@@ -12,7 +14,7 @@ const GenericDevice = require('./devices/generic-device');
 const utils = require('./lib/utils');
 
 var CONFIG = undefined;
-let tuyaDevices: TuyaDevice[] = new Array();
+let tuyaDevices = new Array();
 
 // Setup Exit Handlers
 process.on('exit', processExit.bind(0));
@@ -33,7 +35,7 @@ async function processExit(exitCode) {
 }
 
 // Get new deivce based on configured type
-function getDevice:TuyaDevice(configDevice, mqttClient) {
+function getDevice(configDevice, mqttClient) {
     const deviceInfo = {
         configDevice: configDevice,
         mqttClient: mqttClient,
@@ -101,6 +103,8 @@ const main = async() => {
         CONFIG.useDeviceTopic = false;
     }
 
+    CONFIG.topicCount = CONFIG.topic.split('/').filter(elm => elm).length;
+
     try {
         configDevices = fs.readFileSync('./devices.conf', 'utf8');
         configDevices = json5.parse(configDevices);
@@ -128,7 +132,7 @@ const main = async() => {
         initDevices(configDevices, mqttClient);
         
         for (let tuyaDevice of tuyaDevices) {
-            const deviceTopic = tuyaDevice.getBasicTopic();
+            const deviceTopic = tuyaDevice.getBasicTopic() + "#";
             debug('Subscribe to device topic -> ' + deviceTopic);
             mqttClient.subscribe(deviceTopic);
         }
@@ -156,9 +160,9 @@ const main = async() => {
         try {
             message = message.toString();
             const splitTopic = topic.split('/');
-            const topicLength = splitTopic.length;
-            const commandTopic = splitTopic[topicLength - 1];
-            const deviceTopicLevel = splitTopic[1];
+            const deviceTopics = splitTopic.slice(CONFIG.topicCount);
+            const topicLength = deviceTopics.length;
+            const commandTopic = deviceTopics[topicLength - 1];
 
             if(CONFIG.useHomeAssistant) {
                 if (topic === 'homeassistant/status' || topic === 'hass/status' ) {
@@ -169,7 +173,7 @@ const main = async() => {
                 }
             }
             
-            if (commandTopic.includes('command')) {
+            if (commandTopic.includes('cmnd')) {
                 // If it looks like a valid command topic try to process it
                 debugCommand('Received MQTT message -> ', JSON.stringify({
                     topic: topic,
@@ -177,15 +181,15 @@ const main = async() => {
                 }));
 
                 // Use device topic level to find matching device
-                const device = tuyaDevices.find(d => d.options.name === deviceTopicLevel || d.options.id === deviceTopicLevel);
+                const device = tuyaDevices.find(d => topic.includes(d.baseTopic));
                 switch (topicLength) {
-                    case 3:
+                    case 1:
                         device.processCommand(message, commandTopic);
                         break;
-                    case 4:
+                    case 2:
                         device.processDpsCommand(message);
                         break;
-                    case 5:
+                    case 3:
                         const dpsKey = splitTopic[topicLength-2];
                         device.processDpsKeyCommand(message, dpsKey);
                         break;

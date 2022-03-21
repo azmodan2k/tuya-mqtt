@@ -32,7 +32,7 @@ class SimpleSwitch extends TuyaDevice {
         const discoveryData = {
             name: (this.config.name) ? this.config.name : this.config.id,
             state_topic: this.baseTopic+'state',
-            command_topic: this.baseTopic+'command',
+            command_topic: this.baseTopic+'cmnd',
             availability_topic: this.baseTopic+'LWT',
             payload_available: 'online',
             payload_not_available: 'offline',

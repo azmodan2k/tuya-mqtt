@@ -111,14 +111,14 @@ class RGBTWLight extends TuyaDevice {
         const discoveryData = {
             name: (this.config.name) ? this.config.name : this.config.id,
             state_topic: this.baseTopic+'state',
-            command_topic: this.baseTopic+'command',
+            command_topic: this.baseTopic+'cmnd',
             brightness_state_topic: this.baseTopic+'color_brightness_state',
-            brightness_command_topic: this.baseTopic+'color_brightness_command',
+            brightness_command_topic: this.baseTopic+'color_brightness_cmnd',
             brightness_scale: 100,
             hs_state_topic: this.baseTopic+'hs_state',
-            hs_command_topic: this.baseTopic+'hs_command',
+            hs_command_topic: this.baseTopic+'hs_cmnd',
             white_value_state_topic: this.baseTopic+'white_brightness_state',
-            white_value_command_topic: this.baseTopic+'white_brightness_command',
+            white_value_command_topic: this.baseTopic+'white_brightness_cmnd',
             white_value_scale: 100,
             availability_topic: this.baseTopic+'LWT',
             payload_available: 'online',
@@ -129,7 +129,7 @@ class RGBTWLight extends TuyaDevice {
 
         if (this.config.dpsColorTemp) {
             discoveryData.color_temp_state_topic = this.baseTopic+'color_temp_state'
-            discoveryData.color_temp_command_topic = this.baseTopic+'color_temp_command'
+            discoveryData.color_temp_command_topic = this.baseTopic+'color_temp_cmnd'
             discoveryData.min_mireds = this.config.minColorTemp
             discoveryData.max_mireds = this.config.maxColorTemp
         }

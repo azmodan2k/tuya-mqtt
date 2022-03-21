@@ -1,0 +1,11 @@
+[
+  {
+    room: 'roomName',
+	name: 'deviceName',
+    id: 'idOfDevice',
+    key: 'key',
+    type: 'RGBTWLight',
+    ip: 'ipAddress',
+    version: '3.3'
+  }
+]
