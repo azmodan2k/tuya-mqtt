@@ -16,6 +16,8 @@ RUN git clone https://github.com/azmodan2k/tuya-mqtt.git /opt/tuya-mqtt
 
 RUN npm install
 
-ENV DEBUG=tuya-mqtt:*,TuyAPI
+#ENV DEBUG=tuya-mqtt:*,TuyAPI
+ENV DEBUG=tuya-mqtt:*
+#ENV DEBUG=TuyAPI
 
 CMD ["node", "tuya-mqtt.js"]
