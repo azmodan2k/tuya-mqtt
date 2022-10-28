@@ -12,3 +12,5 @@ services:
       - ./devices.conf:/opt/tuya-mqtt/devices.conf
     networks:
       - default
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
