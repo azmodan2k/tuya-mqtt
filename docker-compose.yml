@@ -8,6 +8,7 @@ services:
       context: .
     restart: always
     volumes:
+      - ./devices/:/opt/tuya-mqtt/devices/
       - ./config.json:/opt/tuya-mqtt/config.json
       - ./devices.conf:/opt/tuya-mqtt/devices.conf
     networks:
