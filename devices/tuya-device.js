@@ -36,9 +36,9 @@ class TuyaDevice {
         // Set default device data for Home Assistant device registry
         // Values may be overridden by individual devices
         this.deviceData = { 
-            ids: [ this.config.id ],
+            identifiers: [ this.config.id ],
             name: (this.config.name) ? this.config.name : this.config.id,
-            mf: 'Tuya'
+            manufacturer: 'Tuya'
         };
 
         // Initialize properties to hold cached device state data
@@ -56,6 +56,7 @@ class TuyaDevice {
         if(this.useDeviceTopic) {
             if(this.config.room) {
                 this.baseTopic = this.topic.replace('%room%', this.config.room);
+                this.deviceData.name = this.deviceData.name + " " + this.config.room;
             } else {
                 this.baseTopic = this.topic.replace('%room%', 'tuya');
             }

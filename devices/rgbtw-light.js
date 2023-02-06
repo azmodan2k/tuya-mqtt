@@ -31,7 +31,8 @@ class RGBTWLight extends TuyaDevice {
         this.config.colorType = this.config.colorType ? this.config.colorType : this.guess.colorType
         this.config.dpsScene = this.config.dpsScene ? this.config.dpsScene : this.guess.dpsScene
 
-        this.deviceData.mdl = 'RGBTW Light'
+        // this.deviceData.mdl = 'RGBTW Light'
+        this.deviceData.model = 'RGBTW Light'
         this.isRgbtwLight = true
 
         // Set white value transform math
@@ -219,22 +220,27 @@ class RGBTWLight extends TuyaDevice {
         const configTopic = 'homeassistant/light/'+this.config.id+'/config'
 
         const discoveryData = {
-            name: (this.config.name) ? this.config.name : this.config.id,
-            state_topic: this.baseTopic+'state',
-            command_topic: this.baseTopic+'cmnd',
+            availability_topic: this.baseTopic+'LWT',
             brightness_state_topic: this.baseTopic+'color_brightness_state',
             brightness_command_topic: this.baseTopic+'color_brightness_cmnd',
             brightness_scale: 100,
+            command_topic: this.baseTopic+'cmnd',
+            device: this.deviceData,
+            effect_command_topic: this.baseTopic+'predefinedScenes_cmnd',
+            effect_list: [
+              'night',
+              'read'
+            ],
             hs_state_topic: this.baseTopic+'hs_state',
             hs_command_topic: this.baseTopic+'hs_cmnd',
-            white_value_state_topic: this.baseTopic+'white_brightness_state',
-            white_value_command_topic: this.baseTopic+'white_brightness_cmnd',
-            white_value_scale: 100,
-            availability_topic: this.baseTopic+'LWT',
+            name: this.deviceData.name,
             payload_available: 'online',
             payload_not_available: 'offline',
+            state_topic: this.baseTopic+'state',
+            //white_value_state_topic: this.baseTopic+'white_brightness_state',
+            //white_value_command_topic: this.baseTopic+'white_brightness_cmnd',
+            //white_value_scale: 100,
             unique_id: this.config.id,
-            device: this.deviceData
         }
 
         if (this.config.dpsColorTemp) {
